@@ -6,6 +6,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/gorilla/handlers"
 )
 
 var (
@@ -38,7 +40,7 @@ func main() {
 	if fi, err := os.Stat(body); err == nil {
 		switch mode := fi.Mode(); {
 		case mode.IsDir():
-			handler = http.StripPrefix(*path, http.FileServer(http.Dir(body)))
+			handler = handlers.LoggingHandler(os.Stderr, http.StripPrefix(*path, http.FileServer(http.Dir(body))))
 		case mode.IsRegular():
 			if content, err := ioutil.ReadFile(body); err != nil {
 				log.Fatal("Error reading file: ", err)
